@@ -1,6 +1,7 @@
 package academy.codelab.springboot2.service;
 
 import academy.codelab.springboot2.domain.Anime;
+import academy.codelab.springboot2.exception.BadRequestException;
 import academy.codelab.springboot2.mapper.AnimeMapper;
 import academy.codelab.springboot2.repository.AnimeRepository;
 import academy.codelab.springboot2.requests.AnimePostRequestBody;
@@ -28,7 +29,7 @@ public class AnimeService   {
 
     public Anime findByIdOrThrowBadRequestException(long id) {
         return animeRepository.findById(id)
-                        .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Anime ID not Found"));
+                        .orElseThrow(() -> new BadRequestException("Anime not Found"));
     }
 
     public Anime save(AnimePostRequestBody animePostRequestBody) {
