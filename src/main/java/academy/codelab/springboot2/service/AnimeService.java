@@ -25,6 +25,10 @@ public class AnimeService   {
         return animeRepository.findAll(pageable);
     }
 
+    public List<Anime> listAllNonPageable() {
+        return animeRepository.findAll();
+    }
+
     public List<Anime> findByName(String name)
     {
         return animeRepository.findByName(name);
@@ -43,6 +47,8 @@ public class AnimeService   {
     public void delete(long id) {
         animeRepository.delete(findByIdOrThrowBadRequestException(id));
     }
+
+
 
     public void replace(AnimePutRequestBody animePutRequestBody) {
         Anime savedAnime = findByIdOrThrowBadRequestException(animePutRequestBody.getId());
