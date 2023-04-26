@@ -2,7 +2,6 @@ package academy.codelab.springboot2.repository;
 
 import academy.codelab.springboot2.domain.Anime;
 import lombok.extern.log4j.Log4j2;
-import org.assertj.core.api.Assert;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -67,6 +66,14 @@ class AnimeRepositoryTest {
 
         Assertions.assertThat(animes).isNotEmpty();
         Assertions.assertThat(animes).contains(animeSaved);
+    }
+
+    @Test
+    @DisplayName("Find By Name returns empty list when no anime is found")
+    void findByName_ReturnsEmptyList_WhenAnimeIsNotFound() {
+        List<Anime> animes = this.animeRepository.findByName("xaxa");
+
+        Assertions.assertThat(animes).isEmpty();
     }
 
     private Anime createAnime() {
