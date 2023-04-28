@@ -24,7 +24,7 @@ public class SecurityConfig {
                 //.csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse()).and()
                 .authorizeHttpRequests((authz) -> authz
                 .anyRequest().authenticated()
-        ).httpBasic(withDefaults());
+        ).formLogin().and().httpBasic(withDefaults());
         return http.build();
     }
 
