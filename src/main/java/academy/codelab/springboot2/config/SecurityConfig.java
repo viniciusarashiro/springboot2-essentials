@@ -40,14 +40,25 @@ public class SecurityConfig {
         http.csrf().disable()
                 //.csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse()).and()
                 .authorizeHttpRequests((authz) -> authz
+                        .requestMatchers("/animes/admin/**").hasRole("ADMIN")
+                        .requestMatchers("/animes/**").hasRole("USER")
                 .anyRequest().authenticated().and().authenticationManager(authenticationManager)).formLogin().and().httpBasic(withDefaults());
         return http.build();
     }
 
     @Bean
     public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
+
+        PasswordEncoder encoder = PasswordEncoderFactories.createDelegatingPasswordEncoder();
+        log.info("Password encode{}", encoder.encode("vinicius"));
+
+//        String password = "Hello Password String";
+//        BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+//        log.info("Password encode{}", passwordEncoder.encode("vinicius"));
+//        return new BCryptPasswordEncoder();
+        return encoder;
     }
+
     @Bean
     public AuthenticationManager authManager(HttpSecurity http, PasswordEncoder passwordEncoder, CodelabUserDetailsService codelabUserDetailsService)
             throws Exception {
@@ -60,7 +71,7 @@ public class SecurityConfig {
     @Bean
     public InMemoryUserDetailsManager userDetailsService() {
         PasswordEncoder encoder = PasswordEncoderFactories.createDelegatingPasswordEncoder();
-        log.info("Password encode{}", encoder.encode("vinicius"));
+//        log.info("Password encode{}", encoder.encode("vinicius"));
         UserDetails user = User.withUsername("vinicius")
                 .password(encoder.encode("vinicius"))
                 .roles("USER")
