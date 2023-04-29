@@ -12,8 +12,8 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
+import org.springframework.security.crypto.password.NoOpPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
@@ -48,15 +48,7 @@ public class SecurityConfig {
 
     @Bean
     public PasswordEncoder passwordEncoder() {
-
-        PasswordEncoder encoder = PasswordEncoderFactories.createDelegatingPasswordEncoder();
-        log.info("Password encode{}", encoder.encode("vinicius"));
-
-//        String password = "Hello Password String";
-//        BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
-//        log.info("Password encode{}", passwordEncoder.encode("vinicius"));
-//        return new BCryptPasswordEncoder();
-        return encoder;
+        return NoOpPasswordEncoder.getInstance();
     }
 
     @Bean
@@ -71,7 +63,6 @@ public class SecurityConfig {
     @Bean
     public InMemoryUserDetailsManager userDetailsService() {
         PasswordEncoder encoder = PasswordEncoderFactories.createDelegatingPasswordEncoder();
-//        log.info("Password encode{}", encoder.encode("vinicius"));
         UserDetails user = User.withUsername("vinicius")
                 .password(encoder.encode("vinicius"))
                 .roles("USER")
