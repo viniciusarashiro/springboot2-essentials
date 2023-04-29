@@ -1,12 +1,18 @@
 package academy.codelab.springboot2.config;
 
+import academy.codelab.springboot2.service.CodelabUserDetailsService;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
@@ -15,34 +21,56 @@ import org.springframework.security.web.SecurityFilterChain;
 import static org.springframework.security.config.Customizer.withDefaults;
 
 @Configuration
+@Log4j2
+@EnableWebSecurity
+@RequiredArgsConstructor
 @EnableMethodSecurity
 public class SecurityConfig {
 
+    private final CodelabUserDetailsService codelabUserDetailsService;
+    AuthenticationManager authenticationManager;
+
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+
+        AuthenticationManagerBuilder authenticationManagerBuilder = http.getSharedObject(AuthenticationManagerBuilder.class);
+        authenticationManagerBuilder.userDetailsService(codelabUserDetailsService);
+        authenticationManager = authenticationManagerBuilder.build();
+
         http.csrf().disable()
                 //.csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse()).and()
                 .authorizeHttpRequests((authz) -> authz
-                .anyRequest().authenticated()
-        ).formLogin().and().httpBasic(withDefaults());
+                .anyRequest().authenticated().and().authenticationManager(authenticationManager)).formLogin().and().httpBasic(withDefaults());
         return http.build();
     }
 
     @Bean
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
+    }
+    @Bean
+    public AuthenticationManager authManager(HttpSecurity http, PasswordEncoder passwordEncoder, CodelabUserDetailsService codelabUserDetailsService)
+            throws Exception {
+        return http.getSharedObject(AuthenticationManagerBuilder.class)
+                .userDetailsService(codelabUserDetailsService)
+                .passwordEncoder(passwordEncoder)
+                .and()
+                .build();
+    }
+    @Bean
     public InMemoryUserDetailsManager userDetailsService() {
         PasswordEncoder encoder = PasswordEncoderFactories.createDelegatingPasswordEncoder();
+        log.info("Password encode{}", encoder.encode("vinicius"));
         UserDetails user = User.withUsername("vinicius")
                 .password(encoder.encode("vinicius"))
                 .roles("USER")
                 .build();
 
-        UserDetails admin = User.withUsername("admin")
-                .password(encoder.encode("admin"))
+        UserDetails admin = User.withUsername("codelab")
+                .password(encoder.encode("codelab"))
                 .roles("USER", "ADMIN")
                 .build();
         return new InMemoryUserDetailsManager(user, admin);
     }
-
-
 
 }

@@ -8,6 +8,7 @@
 		<version>3.0.6</version>
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
+
 	<groupId>academy.codelab</groupId>
 	<artifactId>springboot2-essentials</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
